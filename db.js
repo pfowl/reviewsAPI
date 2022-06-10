@@ -7,40 +7,42 @@ const pool = new Pool({
   host: 'localhost',
   database: 'reviews',
   password: process.env.DB_PASS,
-  port: process.env.PORT,
+  port: process.env.DB_PORT,
 })
+//`SELECT id, url FROM photos WHERE review_id=${reviewId} `
+const getPhotos = async (reviewId = 5) => {
+ return await pool.query(`
+ SELECT url, id, review_id FROM photos where review_id = ANY (SELECT id FROM review WHERE id <= 20)
+ `)
+}
+//;
 
-const getPhotos = async () => {
- let res = await pool.query('SELECT * FROM photos WHERE review_id = 10')
- console.log(res.rows)
-  await pool.end()
+const getReviews = async () => {
+  return await pool.query(`SELECT * FROM review WHERE id <= 20`);
 }
 
-const addPhotos = async (review_id, url) => {
+const addPhotos = (id, review_id, url) => {
   //console.log(review_id, url)
-  await pool.query(`
-  INSERT INTO photos (review_id, url) VALUES (${review_id}, '${url}')
-  `).then((res)=> {
-    //console.log('THIS IS RES', res);
-  })
-  .catch((err) => {
-    console.log(err)
-  });
-  await pool.end;
+  pool.query(`
+  INSERT INTO photos (id, review_id, url) VALUES (${id}, ${review_id}, '${url}')
+  `)
+  pool.end;
 }
 
-const addCharacteristic = async ( char_id, review_id, value) => {
+const addCharacteristic = async ( id, char_id, review_id, value) => {
   await pool.query(`
-  INSERT INTO characteristics (characteristic_id, review_id, value) 
-  VALUES (${char_id},${review_id},${value})
+  INSERT INTO characteristics (id, characteristic_id, review_id, value) 
+  VALUES (${id}, ${char_id}, ${review_id}, ${value})
   `).then((res) => {
 
   }).catch(err => console.log(err));
+  await pool.end;
 }
 
-//getPhotos()
 module.exports = {
+  getPhotos,
   addPhotos, 
   addCharacteristic,
+  getReviews,
   pool
-  };
+};
