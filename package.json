@@ -2,9 +2,9 @@
   "name": "supernova-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
-    "start": "npx nodemon server.js",
+    "start": "npx nodemon server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
