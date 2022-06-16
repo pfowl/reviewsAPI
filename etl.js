@@ -1,28 +1,84 @@
-const fs = require('fs');
-const {addPhotos, addCharacteristic, pool}= require('./db.js');
-const fastCSV = require('fast-csv');
-const photoDataLocation = './csv/reviews_photos.csv';
-const characteristicDataLocation = './csv/characteristic_reviews.csv';
 
-//let stream_photos = fs.createReadStream(photoDataLocation);
-let csvStream = fastCSV.parse({headers: true})
-.on('data', (data) => {
-  addPhotos(data.id, data.review_id, data.url)
-})
-.on('end', (data) => {
-  console.log(`${data} Photos Inserted`)
-});
-//console.log(`Adding Photos from ${photoDataLocation}`)
-//stream_photos.pipe(csvStream);
+const {Reviews}= require('./db/Reviews');
 
-////let stream_characteristic = fs.createReadStream(characteristicDataLocation);
-let characteristicStream = fastCSV.parse({headers: true})
-.on('data', (data) => {
-  
-  addCharacteristic(data.id, data.characteristic_id, data.review_id, data.value)
-})
-.on('end', (data) => {
-  console.log(`${data} Characteristic Records Inserted`)
-});
-//console.log(`${characteristicDataLocation} Records are being Inserted`)
-//stream_characteristic.pipe(characteristicStream);
+let addReviewTable = () => {
+  Reviews.query(`
+  CREATE TABLE review(
+    id SERIAL PRIMARY KEY,
+    product_id integer,
+    rating integer,
+    date bigint,
+    summary VARCHAR(1200),
+    body VARCHAR(2000),
+    recommend BOOLEAN,
+    reported BOOLEAN,
+    reviewer_name VARCHAR(150),
+    reviewer_email VARCHAR(150),
+    response VARCHAR(2000),
+    helpfulness integer
+  )
+  `)
+};
+
+let copy = '\\';
+let addReviewData = () => {
+  Reviews.query(`
+    ${copy} review(id, product_id,rating,date,summary,body,recommend,reported,reviewer_name,reviewer_email,response,helpfulness)
+    FROM '/Users/mstrsplinter/Documents/hackreactor/sdc/csv/reviews.csv'
+    DELIMITER ','
+    CSV HEADER;
+  `)
+}
+//addReviewTable();
+console.log('COPY 😶‍🌫️', copy)
+addReviewData();
+
+let addPhotosTable = () => {
+  Reviews.query(`
+  CREATE TABLE photos(
+    id SERIAL PRIMARY KEY,
+    review_id integer,
+    url VARCHAR(1200),
+    FOREIGN KEY (review_id) REFERENCES review(id)
+  )
+  `)
+}
+
+let addPhotosData = () => {
+  Reviews.query(`
+    
+  `)
+}
+//run it
+
+let addCharOverviewTable = () => {
+  Reviews.query(`
+  CREATE TABLE charOverview(
+    id SERIAL PRIMARY KEY,
+    product_id integer,
+    name VARCHAR(100)
+  )
+  `)
+}
+let addCharOverviewData = () => {
+  Reviews.query(`
+
+  `)
+}
+//run it
+
+let addCharacteristicsTable = () => {
+  Reviews.query(`
+  CREATE TABLE characteristics(
+    id SERIAL PRIMARY KEY,
+    characteristic_id integer,
+    review_id integer,
+    value integer
+  )
+  `)
+}
+let addCharacteristicsData = () => {
+  Reviews.query(`
+    
+  `)
+}
